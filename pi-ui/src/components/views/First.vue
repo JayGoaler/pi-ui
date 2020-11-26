@@ -2,8 +2,6 @@
   <el-form>
     <el-form-item>
       <el-tree :data="list"></el-tree>
-      <el-button type="primary" @click="onSubmit">立即创建</el-button>
-      <el-button>取消</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -15,10 +13,10 @@ export default {
       list: []
     }
   },
+  mounted: function () {
+    this.send()
+  },
   methods: {
-    onSubmit () {
-      this.send()
-    },
     send () {
       axios({
         method: 'get',

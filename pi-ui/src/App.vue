@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <el-link type="primary" href='/first'>文件管理</el-link>
     <router-view/>
   </div>
 </template>
