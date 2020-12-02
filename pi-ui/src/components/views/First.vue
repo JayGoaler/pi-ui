@@ -39,6 +39,7 @@
 </template>
 <script>
 const axios = require('axios')
+axios.defaults.baseURL = process.env.BASE_URL
 export default {
   data () {
     return {
@@ -71,7 +72,7 @@ export default {
     send () {
       axios({
         method: 'get',
-        url: 'http://192.168.8.176:9527/fileSystem/getFileTree'
+        url: '/fileSystem/getFileTree'
       }).then(async resp => {
         if (resp.status === 200 && resp.data.success) {
           this.list = await this.setTreeData(resp.data.data, 'parentId', 'id')
@@ -103,7 +104,7 @@ export default {
       if (data.file) {
         this.$confirm('确定要下载文件？')
           .then(_ => {
-            window.open('http://192.168.8.176:9527/file/' + data.id)
+            window.open('/file/' + data.id)
             this.$notify({
               title: '成功',
               message: '下载文件成功！',
