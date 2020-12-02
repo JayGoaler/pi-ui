@@ -1,16 +1,67 @@
 <template>
-  <el-form>
-    <el-form-item>
-      <el-tree :data="list"></el-tree>
-    </el-form-item>
-  </el-form>
+  <div class="main_div">
+    <div class="treeDiv">
+      <el-tree :data="list" :accordion="true" :render-content="renderContent" :expand-on-click-node="false"
+        :default-expanded-keys="expandedList"
+        node-key="id"
+        :highlight-current="true"
+        @node-expand="nodeExpand"
+        />
+    </div>
+    <el-drawer
+      title="上传文件至服务器"
+      :before-close="handleClose"
+      :visible.sync="dialog"
+      :with-header="false"
+      direction="rtl"
+      custom-class="demo-drawer"
+      ref="drawer"
+      >
+      <div class="demo-drawer__content">
+        <el-form :model="form">
+          <el-form-item label="文件上传" prop="fysjtDesc">
+            <el-upload
+                class="upload-demo"
+                ref="upload"
+                action="http://192.168.8.176:9527/file/uploadFile"
+                :on-success="handleUploadSuccess"
+                :data="getfileData()"
+                :file-list="fileList"
+                :auto-upload="false">
+            <el-button slot="trigger" size="small" type="primary">选取附件</el-button>
+            <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-drawer>
+  </div>
 </template>
 <script>
 const axios = require('axios')
 export default {
   data () {
     return {
-      list: []
+      dialog: false,
+      loading: false,
+      formLabelWidth: '80px',
+      list: [],
+      form: {
+        name: '',
+        region: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: ''
+      },
+      fileData: {
+        id: ''
+      },
+      fileList: [],
+      expandedList: []
+
     }
   },
   mounted: function () {
@@ -22,12 +73,71 @@ export default {
         method: 'get',
         url: 'http://192.168.8.176:9527/fileSystem/getFileTree'
       }).then(async resp => {
-        console.log(resp)
         if (resp.status === 200 && resp.data.success) {
           this.list = await this.setTreeData(resp.data.data, 'parentId', 'id')
-          console.log(this.list)
         }
       })
+    },
+    handleClose (done) {
+      this.$confirm('确定要关闭吗？')
+        .then(_ => {
+          this.dialog = false
+        })
+        .catch(_ => {})
+    },
+    cancelForm () {
+      this.loading = false
+      this.dialog = false
+      clearTimeout(this.timer)
+    },
+    renderContent (h, { node, data, store }) {
+      return (
+        <span class="custom-tree-node">
+          <span>{node.label}</span>
+          <span>
+            <el-button size="mini" type="text" on-click={ () => this.open(data) }>{data.file ? '下载' : '上传'}</el-button>
+          </span>
+        </span>)
+    },
+    open (data) {
+      if (data.file) {
+        this.$confirm('确定要下载文件？')
+          .then(_ => {
+            window.open('http://192.168.8.176:9527/file/' + data.id)
+            this.$notify({
+              title: '成功',
+              message: '下载文件成功！',
+              type: 'success'
+            })
+          })
+        return
+      }
+      this.dialog = true
+      this.fileData.id = data.id
+    },
+    getfileData () {
+      return this.fileData
+    },
+    submitUpload () {
+      this.$refs.upload.submit()
+    },
+    handleUploadSuccess (response, file, fileList) {
+      // 文件上传成功后的操作
+      if (response.success) {
+        this.$notify({
+          title: '成功',
+          message: '上传成功！',
+          type: 'success'
+        })
+        this.$refs.upload.clearFiles()
+        this.dialog = false
+        this.send()
+      }
+    },
+    nodeExpand (data) {
+      this.expandedList = []
+      this.expandedList.push(data.id)
+      console.log(this.expandedList)
     },
     setTreeData (arr, fdm, dm) {
       // 删除所有的children,以防止多次调用
@@ -57,3 +167,16 @@ export default {
   }
 }
 </script>
+<style>
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+  }
+  .treeDiv {
+    width: 35%;
+  }
+</style>

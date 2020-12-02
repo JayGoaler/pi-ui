@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <el-link type="primary" href='/first'>文件管理</el-link>
+    <!-- <el-link type="primary" href='/first'>文件管理</el-link> -->
     <router-view/>
   </div>
 </template>
