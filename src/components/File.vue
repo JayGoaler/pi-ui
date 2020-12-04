@@ -204,6 +204,6 @@ export default {
   padding-right: 8px;
 }
 .treeDiv {
-  width: 35%;
+  width: 50%;
 }
 </style>
