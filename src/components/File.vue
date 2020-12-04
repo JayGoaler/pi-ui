@@ -28,7 +28,7 @@
             <el-upload
               class="upload-demo"
               ref="upload"
-              action="http://192.168.8.176:9527/file/uploadFile"
+              action="/file/uploadFile"
               :on-success="handleUploadSuccess"
               :data="getfileData()"
               :file-list="fileList"
