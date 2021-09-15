@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/respberryPi.jpg" />
-    <File msg="Welcome to Your RespberryPi" />
+    <File />
   </div>
 </template>
 
